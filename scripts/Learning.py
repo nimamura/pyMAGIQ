@@ -6,6 +6,7 @@ import tensorflow as tf
 import random as rn
 
 import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 os.environ['PYTHONHASHSEED'] = '0'
 np.random.seed(r_seed)
 rn.seed(r_seed)
@@ -53,40 +54,6 @@ def neuralnet():
     model = Sequential()
 
     # add layers
-    # model.add(Dense( activation=activation, units=nunits,
-    #                  kernel_regularizer=regularizers.l1(reg_ker),
-    #                  input_dim=ndata*ncomp*nfreq*2))
-    #
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits*3 ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits*2 ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.8) ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.5) ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.25) ))
-    #
-    #
-    # model.add(Dense( activation='softmax', units=nrate,
-    #                  kernel_regularizer=regularizers.l1(reg_ker)))
-
-    # add layers
     reg_val = -6
     reg_ker = -5.5
     mid_units = 50
@@ -116,25 +83,10 @@ ncomp = 2
 epochs = 500
 batch_size = 32
 
-# number of bagging
-# rounds = 1
-# rounds = 5
-
 #************************************************************************/
 # setting directories
-# frequency sets for USArray (Currently, this code works only with these frequencies)
-# freqsets = [  1.367187E-01, 1.093750E-01, 8.593753E-02, 6.640627E-02, 5.078124E-02, 3.906250E-02,
-#         3.027344E-02, 2.343750E-02, 1.855469E-02, 1.464844E-02, 1.171875E-02, 9.765625E-03,
-#         7.568361E-03, 5.859374E-03, 4.638671E-03, 3.662109E-03, 2.929688E-03, 2.441406E-03,
-#         1.892090E-03, 1.464844E-03, 1.159668E-03, 9.155271E-04, 7.324221E-04, 6.103516E-04,
-#         4.425049E-04, 3.204346E-04, 2.136230E-04, 1.373291E-04, 8.392331E-05, 5.340577E-05]
 
-# # number of frequency used in data
-# nfreq = len(freqsets)
-
-datadir = '/Users/nimamura/Library/Mobile Documents/com~apple~CloudDocs/pyMAGIQ/pyMAGIQ/survey/USArray2020Jan_test'
-# datadir = '/Users/nimamura/Library/Mobile Documents/com~apple~CloudDocs/pyMAGIQ/pyMAGIQ/survey/USArray2019March'
-#datadir = '/home/server/pi/homes/nimamura/pyMAGIQ/survey/USArray2019March'
+datadir = '/Users/nimamura/work/pyMAGIQ/survey/USArray2020Jan_test'
 
 traindir    = datadir + '/train'
 # X_trainpath = datadir + '/preprocessed/X_train.csv'
@@ -167,7 +119,7 @@ y_train = np_utils.to_categorical(y_train, nrate)
 #************************************************************************/
 # sort X and y in random
 # This is necessary for the validation_split as validation_split splits only tail part
-X_random, y_random, randindex = pyMAGIQ.utils.MAGIQlib.MAGIQlib.randomsortXY(X_train, y_train)
+X_random, y_random, SiteID_random, randindex = pyMAGIQ.utils.MAGIQlib.MAGIQlib.randomsortXY(X_train, y_train, SiteID_train)
 
 # read model
 model = neuralnet()
@@ -206,6 +158,7 @@ ndata_val = int(len(X_train)*0.1)
 Xval = X_random[-ndata_val:-1,:]
 yval = y_random[-ndata_val:-1]
 index_val = randindex[-ndata_val:-1]
+SiteIDval = SiteID_random[-ndata_val:-1]
 
 # read model
 model = model_from_json(open(outputpath+'/model.json').read())
@@ -215,11 +168,7 @@ model.load_weights(outputpath+'/weights.hdf5')
 
 model.summary()
 
-# # setting optimization
-# model.compile(loss="categorical_crossentropy",
-#               optimizer=Adamax(),
-#               metrics=["accuracy"])
-#evaluate unrated
+# evaluate unrated
 yval_est  = model.predict(Xval)
 
 pyMAGIQ.utils.MAGIQlib.MAGIQlib.ratehistogram2d(yval_est,yval,5,fpath=outputpath+'/hist2d.eps')
