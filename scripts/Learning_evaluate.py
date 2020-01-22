@@ -6,6 +6,7 @@ import tensorflow as tf
 import random as rn
 
 import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 os.environ['PYTHONHASHSEED'] = '0'
 np.random.seed(r_seed)
 rn.seed(r_seed)
@@ -40,6 +41,12 @@ import matplotlib.pyplot as plt
 # Local Import
 import pyMAGIQ
 
+# load xml_unrated dict with pickle
+try:
+    import cPickle as pickle
+except ImportError:  # python 3.x
+    import pickle
+
 #************************************************************************/
 def neuralnet():
     # regularization parameters
@@ -52,40 +59,6 @@ def neuralnet():
 
     # initialize model
     model = Sequential()
-
-    # add layers
-    # model.add(Dense( activation=activation, units=nunits,
-    #                  kernel_regularizer=regularizers.l1(reg_ker),
-    #                  input_dim=ndata*ncomp*nfreq*2))
-    #
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits*3 ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits*2 ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.8) ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.5) ))
-    #
-    # model.add(Dense( activation=activation,
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.25) ))
-    #
-    #
-    # model.add(Dense( activation='softmax', units=nrate,
-    #                  kernel_regularizer=regularizers.l1(reg_ker)))
 
     # add layers
     reg_val = -6
@@ -107,45 +80,6 @@ def neuralnet():
 
     return model
 
-    # initialize model
-    # model = Sequential()
-
-    # add layers
-    # model.add(Dense( activation='relu', units=nunits,
-    #                  kernel_regularizer=regularizers.l1(reg_ker),
-    #                  input_dim=ndata*ncomp*nfreq*2))
-    #
-    #
-    # model.add(Dense( activation='relu',
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits*3 ))
-    #
-    # model.add(Dense( activation='relu',
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits*2 ))
-    #
-    # model.add(Dense( activation='relu',
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=nunits ))
-    #
-    # model.add(Dense( activation='relu',
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.8) ))
-    #
-    # model.add(Dense( activation='relu',
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.5) ))
-    #
-    # model.add(Dense( activation='relu',
-    #                  kernel_regularizer=regularizers.l1(reg_val),
-    #                  units=int(nunits*0.25) ))
-    #
-    #
-    # model.add(Dense( activation='softmax', units=nrate,
-    #                  kernel_regularizer=regularizers.l1(reg_ker)))
-    #
-    # return model
-
 #************************************************************************/
 # parameter in neural network
 nunits = 40
@@ -156,10 +90,6 @@ ndata = 4
 ncomp = 2
 epochs = 1
 batch_size = 32
-
-# number of bagging
-# rounds = 1
-# rounds = 5
 
 #************************************************************************/
 # setting directories
@@ -173,8 +103,8 @@ freqsets = [  1.367187E-01, 1.093750E-01, 8.593753E-02, 6.640627E-02, 5.078124E-
 # # number of frequency used in data
 nfreq = len(freqsets)
 
-# datadir = '/Users/nimamura/Library/Mobile Documents/com~apple~CloudDocs/pyMAGIQ/pyMAGIQ/survey/USArray2019March'
-datadir = '/home/server/pi/homes/nimamura/pyMAGIQ/survey/USArray2019March'
+# datadir = '/home/server/pi/homes/nimamura/pyMAGIQ/survey/USArray2019March'
+datadir = '/Users/nimamura/work/pyMAGIQ/survey/USArray2020Jan_test'
 
 traindir    = datadir + '/train'
 # X_trainpath = datadir + '/preprocessed/X_train.csv'
@@ -209,7 +139,7 @@ y_train = np_utils.to_categorical(y_train, nrate)
 #************************************************************************/
 # sort X and y in random
 # This is necessary for the validation_split as validation_split splits only tail part
-X_random, y_random, randindex = pyMAGIQ.utils.MAGIQlib.MAGIQlib.randomsortXY(X_train, y_train)
+X_random, y_random, SiteID_random, randindex = pyMAGIQ.utils.MAGIQlib.MAGIQlib.randomsortXY(X_train, y_train, SiteID_train)
 
 # read model
 # model = neuralnet()
@@ -284,11 +214,6 @@ nMTunrated  = len(unratedlists)
 df=pd.read_csv(X_unratedpath, sep=',',header=None)
 X_unrated = df.values
 
-# load xml_unrated dict with pickle
-try:
-    import cPickle as pickle
-except ImportError:  # python 3.x
-    import pickle
 
 with open(outputpath+'/xml_unrated.p', 'rb') as fp:
     xml_unrated = pickle.load(fp)
@@ -328,79 +253,6 @@ pyMAGIQ.vis.plotUSmap.plotMap(datadir,xmin,xmax,ymin,ymax,latlist,lonlist,rateli
 for i in range(1,6):
     print(i, ' number of index ',ratelist.count(i))
 # ratelist.index(3)
-
-
-#************************************************************************/
-import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
-
-#************************************************************************/
-def plot_Z(alldata,targetSiteID,fpath):
-
-    fig = plt.figure(figsize=(14,12))
-    outer = gridspec.GridSpec(3, 3, wspace=0.2, hspace=0.2)
-
-    for i in range(9):
-        inner = gridspec.GridSpecFromSubplotSpec(2, 1,
-                subplot_spec=outer[i], wspace=0.1, hspace=0.1)
-
-        # target Site ID name
-        target = targetSiteID[i]
-
-        # read variable
-        Zapp_xy     = alldata[target]['Zapp_xy']
-        Zapp_err_xy = alldata[target]['Zapp_err_xy']
-        Zphs_xy     = alldata[target]['Zphs_xy']
-        Zphs_err_xy = alldata[target]['Zphs_err_xy']
-
-        Zapp_yx     = alldata[target]['Zapp_yx']
-        Zapp_err_yx = alldata[target]['Zapp_err_yx']
-        Zphs_yx     = alldata[target]['Zphs_yx']
-        Zphs_err_yx = alldata[target]['Zphs_err_yx']
-
-        period      = alldata[target]['period']
-        prate       = alldata[target]['prate']
-        if 'grate' in alldata[target].keys():
-            grate   = alldata[target]['grate']
-            title_str = 'Pred Rate: ' + str(prate) + '  Given Rate: ' + str(grate)
-        else:
-            title_str = 'Pred Rate: ' + str(prate)
-
-
-        for j in range(2):
-            ax = plt.Subplot(fig, inner[j])
-            ax.grid()
-            if j == 0:
-                ax.set_title(title_str)
-                ax.errorbar(period, Zapp_xy, yerr=Zapp_err_xy, fmt='o', mfc='none', capsize=4, label='xy')
-                ax.errorbar(period, Zapp_yx, yerr=Zapp_err_yx, fmt='o', mfc='none', capsize=4, label='yx', c='r')
-                ax.set_xscale('log')
-                ax.set_yscale('log')
-                ax.set_xlim([1.E-0,1.E+5])
-                plt.setp(ax.get_xticklabels(), visible=False)
-                if i ==0 or i==3 or i== 6:
-                    ax.set_ylabel("App. Res.")
-
-            else:
-                ax.errorbar(period,Zphs_xy,yerr=Zphs_err_xy,fmt='o',mfc='none',capsize=4)
-                ax.errorbar(period,Zphs_yx,yerr=Zphs_err_yx,fmt='o',mfc='none',capsize=4,c='r')
-                ax.set_xscale('log')
-                ax.set_xlim([1.E-0,1.E+5])
-                ax.set_ylim([0,90])
-                ax.set_yticks([0,30,60,90])
-                if i ==0 or i==3 or i== 6:
-                    ax.set_ylabel("Phase")
-
-                if i >5:
-                    ax.set_xlabel("Period (sec)")
-                # ax.grid()
-
-            fig.add_subplot(ax)
-
-    plt.savefig(fpath,format='eps')
-    # plt.show()
-
-
 
 #************************************************************************/
 # ID list to plot
@@ -468,7 +320,7 @@ for i in range(len(targetSiteID)):
     alldata[targetSiteID[i]]['period']      = period
     alldata[targetSiteID[i]]['prate']       = prate
 
-plot_Z(alldata,targetSiteID,outputpath+'/Appres.eps')
+pyMAGIQ.vis.plotZ.plotZ(alldata,targetSiteID,outputpath+'/Appres.eps')
 
 
 XMLvaldir = datadir + '/validation'
