@@ -34,13 +34,13 @@ unrated
 ```
 
 ## Run code
-1. Please run pre-process by using notebooks/Preprocess.ipynb. Once pre-process has done, you will get npy-files in preprocessed directory.
+1. Please run pre-process by using notebooks/preprocess.ipynb. Once pre-process has done, you will get npy-files in preprocessed directory.
 ```
 jupyter notebook preprocess.ipynb
 ```
-2. Train the neural network with scripts/Learning.py. Trained model and weights will be created in outputs directory.
+2. Train the neural network with scripts/learning.py. Trained model and weights will be created in outputs directory.
 ```
-python scripts/Learning.py
+python scripts/learning.py
 ```
 3. If you like to predict rates for unknown MT stations, then run scripts/predict.py. The predicted rate will be in preprocessed/y_unrated.csv.
 ```
