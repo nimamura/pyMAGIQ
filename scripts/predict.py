@@ -99,96 +99,96 @@ with open(outputpath+'/xml_unrated.p', 'rb') as fp:
 
 #evaluate unrated
 y_unrated  = model.predict(X_unrated)
-y_unrated = np.argmax(y_unrated,axis=1)
+y_unrated = np.argmax(y_unrated,axis=1)+1
 np.savetxt( y_unratedpath, y_unrated, fmt='%d', delimiter=',')
 
-y_unrated = y_unrated.reshape(len(y_unrated))
+# y_unrated = y_unrated.reshape(len(y_unrated))
 
-target = 'unrated'
-
-xmin = -140
-xmax = -65.0
-ymin = 45.0
-ymax = 65.0
-
-latlist = []
-lonlist = []
-
-#************************************************************************/
-# read rate
-ratelist = pyMAGIQ.utils.iofiles.io.read_rate_ytrain(y_unratedpath)
-
-# read site ID
-siteIDlist = pyMAGIQ.utils.iofiles.io.read_siteID(SiteIDpath_unrated)
-
-for i in range(len(xml_unrated)):
-    latlist.append(xml_unrated[i]['lat'])
-    lonlist.append(xml_unrated[i]['lon'])
-
-#************************************************************************/
-# ID list to plot
-# Change this list as you like
-targetSiteID_unrated = ['MT_TF_Lithoprobe.SNO323.1999',
-                'MT_TF_UofAlberta.sa175.2010',
-                'MT_TF_Lithoprobe.WST139.1998',
-                'MT_TF_Lithoprobe.ABT310.1993-1996',
-                'MT_TF_Lithoprobe.ABT301.1993-1996',
-                'MT_TF_Lithoprobe.ABT006.1993-1996',
-                'MT_TF_UofAlberta.bc310.2009',
-                'MT_TF_Lithoprobe.WST004.1998',
-                'MT_TF_CAFE-MT.CAF11.2010' ]
-
-target = 'unrated'
-
-alldata = {}
-
-# read rate
-ratelist = pyMAGIQ.utils.iofiles.io.read_rate_ytrain(y_unratedpath)
-
-# change variable name
-targetSiteID = targetSiteID_unrated
-
-siteIDlist = pyMAGIQ.utils.iofiles.io.read_siteID(SiteIDpath_unrated)
-
-for i in range(len(targetSiteID)):
-    print( targetSiteID[i] )
-    # initialize dictionary for current MT site
-    alldata[targetSiteID[i]] = {}
-    siteIndex = siteIDlist.index( targetSiteID[i] )
-
-    MTdir = datadir + '/' + target + '/' + targetSiteID[i]
-
-    # filename of xml
-    XMLlist = sorted( [f for f in os.listdir(MTdir) if f.endswith('xml')] )
-
-    # path to xml and edi file
-    XMLpath = MTdir + '/' + XMLlist[0]
-
-    period, xmldata, Zapp, Zapp_err, Zphs, Zphs_err, _ = pyMAGIQ.utils.iofiles.io.readXML(XMLpath,True)
-
-    prate = ratelist[siteIndex]
-
-    Zapp2 = Zapp[:,1:2].flatten().tolist()
-    Zapp_err2 = Zapp_err[:,1:2].flatten().tolist()
-    Zphs2 = Zphs[:,1:2].flatten().tolist()
-    Zphs_err2 = Zphs_err[:,1:2].flatten().tolist()
-
-    Zapp3 = Zapp[:,2:3].flatten().tolist()
-    Zapp_err3 = Zapp_err[:,2:3].flatten().tolist()
-    Zphs3 = Zphs[:,2:3].flatten().tolist()
-    Zphs_err3 = Zphs_err[:,2:3].flatten().tolist()
-
-    alldata[targetSiteID[i]]['Zapp_xy']     = Zapp2
-    alldata[targetSiteID[i]]['Zapp_err_xy'] = Zapp_err2
-    alldata[targetSiteID[i]]['Zphs_xy']     = Zphs2
-    alldata[targetSiteID[i]]['Zphs_err_xy'] = Zphs_err2
-
-    alldata[targetSiteID[i]]['Zapp_yx']     = Zapp3
-    alldata[targetSiteID[i]]['Zapp_err_yx'] = Zapp_err3
-    alldata[targetSiteID[i]]['Zphs_yx']     = Zphs3
-    alldata[targetSiteID[i]]['Zphs_err_yx'] = Zphs_err3
-
-    alldata[targetSiteID[i]]['period']      = period
-    alldata[targetSiteID[i]]['prate']       = prate
-
-pyMAGIQ.vis.plotZ.plotZ(alldata,targetSiteID,outputpath+'/Appres.eps')
+# target = 'unrated'
+#
+# xmin = -140
+# xmax = -65.0
+# ymin = 45.0
+# ymax = 65.0
+#
+# latlist = []
+# lonlist = []
+#
+# #************************************************************************/
+# # read rate
+# ratelist = pyMAGIQ.utils.iofiles.io.read_rate_ytrain(y_unratedpath)
+#
+# # read site ID
+# siteIDlist = pyMAGIQ.utils.iofiles.io.read_siteID(SiteIDpath_unrated)
+#
+# for i in range(len(xml_unrated)):
+#     latlist.append(xml_unrated[i]['lat'])
+#     lonlist.append(xml_unrated[i]['lon'])
+#
+# #************************************************************************/
+# # ID list to plot
+# # Change this list as you like
+# targetSiteID_unrated = ['MT_TF_Lithoprobe.SNO323.1999',
+#                 'MT_TF_UofAlberta.sa175.2010',
+#                 'MT_TF_Lithoprobe.WST139.1998',
+#                 'MT_TF_Lithoprobe.ABT310.1993-1996',
+#                 'MT_TF_Lithoprobe.ABT301.1993-1996',
+#                 'MT_TF_Lithoprobe.ABT006.1993-1996',
+#                 'MT_TF_UofAlberta.bc310.2009',
+#                 'MT_TF_Lithoprobe.WST004.1998',
+#                 'MT_TF_CAFE-MT.CAF11.2010' ]
+#
+# target = 'unrated'
+#
+# alldata = {}
+#
+# # read rate
+# ratelist = pyMAGIQ.utils.iofiles.io.read_rate_ytrain(y_unratedpath)
+#
+# # change variable name
+# targetSiteID = targetSiteID_unrated
+#
+# siteIDlist = pyMAGIQ.utils.iofiles.io.read_siteID(SiteIDpath_unrated)
+#
+# for i in range(len(targetSiteID)):
+#     print( targetSiteID[i] )
+#     # initialize dictionary for current MT site
+#     alldata[targetSiteID[i]] = {}
+#     siteIndex = siteIDlist.index( targetSiteID[i] )
+#
+#     MTdir = datadir + '/' + target + '/' + targetSiteID[i]
+#
+#     # filename of xml
+#     XMLlist = sorted( [f for f in os.listdir(MTdir) if f.endswith('xml')] )
+#
+#     # path to xml and edi file
+#     XMLpath = MTdir + '/' + XMLlist[0]
+#
+#     period, xmldata, Zapp, Zapp_err, Zphs, Zphs_err, _ = pyMAGIQ.utils.iofiles.io.readXML(XMLpath,True)
+#
+#     prate = ratelist[siteIndex]
+#
+#     Zapp2 = Zapp[:,1:2].flatten().tolist()
+#     Zapp_err2 = Zapp_err[:,1:2].flatten().tolist()
+#     Zphs2 = Zphs[:,1:2].flatten().tolist()
+#     Zphs_err2 = Zphs_err[:,1:2].flatten().tolist()
+#
+#     Zapp3 = Zapp[:,2:3].flatten().tolist()
+#     Zapp_err3 = Zapp_err[:,2:3].flatten().tolist()
+#     Zphs3 = Zphs[:,2:3].flatten().tolist()
+#     Zphs_err3 = Zphs_err[:,2:3].flatten().tolist()
+#
+#     alldata[targetSiteID[i]]['Zapp_xy']     = Zapp2
+#     alldata[targetSiteID[i]]['Zapp_err_xy'] = Zapp_err2
+#     alldata[targetSiteID[i]]['Zphs_xy']     = Zphs2
+#     alldata[targetSiteID[i]]['Zphs_err_xy'] = Zphs_err2
+#
+#     alldata[targetSiteID[i]]['Zapp_yx']     = Zapp3
+#     alldata[targetSiteID[i]]['Zapp_err_yx'] = Zapp_err3
+#     alldata[targetSiteID[i]]['Zphs_yx']     = Zphs3
+#     alldata[targetSiteID[i]]['Zphs_err_yx'] = Zphs_err3
+#
+#     alldata[targetSiteID[i]]['period']      = period
+#     alldata[targetSiteID[i]]['prate']       = prate
+#
+# pyMAGIQ.vis.plotZ.plotZ(alldata,targetSiteID,outputpath+'/Appres.eps')
