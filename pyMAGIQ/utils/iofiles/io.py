@@ -518,6 +518,7 @@ def read_rate_ytrain(path):
 
     return ratelist
 
+
 #************************************************************************/
 def read_siteID(path):
 
@@ -530,6 +531,8 @@ def read_siteID(path):
             siteIDlist.append(row[0])
 
     return siteIDlist
+
+
 #=================================================================
 # default xml file is in geographic coordinate.
 # If rotate option is True, returned data is in geomagnetic coordinate
@@ -633,52 +636,6 @@ def readXMLonly(XMLpath):
 
     return period, xmldata
 
-#************************************************************************/
-def get_XMLlists(nfreq,fdir,lists,freq_interp,unrated=False):
-
-    icount = 0
-    train_list = []
-    xml_dict = {}
-    # loop for MT training list
-    for MTdirname in lists:
-        print( MTdirname )
-
-        MTdir = fdir + '/' + MTdirname
-        # read xml and edi file in the folder
-        XMLlist = sorted( [f for f in os.listdir(MTdir) if f.endswith('xml')] )
-
-        # check there is only one xml and edi file in the directory
-        pyMAGIQ.utils.MAGIQlib.MAGIQlib.checklists(XMLlist=XMLlist)
-
-        # path to xml and edi file
-        XMLpath = MTdir + '/' + XMLlist[0]
-
-        # get information in XML file
-        try:
-            period, xmldata = pyMAGIQ.utils.iofiles.io.readXMLonly(XMLpath)
-        except ValueError:
-            print( 'skip it! ValueError when reading XML file ', MTdirname )
-            continue
-        except IndexError:
-            print( 'skip it! IndexError when reading XML file ', MTdirname )
-            continue
-
-        # if maximum value periodEDI is smaller than 100 sec, skip it because interpolation won't work well
-        if max(period) < 10000.0:
-            print( 'skip it! Maximum period is smaller than 10,000 sec', MTdirname )
-            continue
-
-        if not unrated:
-            if xmldata['Rating'] == 0:
-                print( 'skip it! rating is 0', MTdirname )
-                continue
-
-        train_list.append(MTdirname)
-        xml_dict[icount] = xmldata
-
-        icount += 1
-
-    return xml_dict,train_list
 
 #************************************************************************/
 def get_XMLlists(nfreq,fdir,lists,freq_interp,unrated=False):
