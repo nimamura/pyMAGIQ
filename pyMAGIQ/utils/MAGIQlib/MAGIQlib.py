@@ -14,6 +14,10 @@ Functions
     - ratehistogram1d
     - ratehistogram2d
     - randomsortXY
+    - rotateXML
+    - xml2Z
+    - getXfromZ
+    - dataaug
 
 NI, 2018
 
@@ -67,7 +71,7 @@ def getXYdataset(X,y,nfreq,fdir,lists,freq_interp):
         # periodEDI, Z, ZERR, Zapp, Zapp_err, Zphs, Zphs_err = gicio_edi.readEDIall(EDIpath, freq_interp)
         nperiod = len(Zapp)
 
-        # if maximum value periodEDI is smaller than 100 sec, skip it because interpolation won't work well
+        # if maximum value periodEDI is smaller than 1000 sec, skip it because interpolation won't work well
         if max(period_ori) < 1000.0:
             print( 'skip it! Maximum period is smaller than 1000 sec', MTdirname )
             continue
@@ -92,23 +96,6 @@ def getXYdataset(X,y,nfreq,fdir,lists,freq_interp):
             #     print MTdirname, 'over 1.E+07'
 
             # Normalize dataset and input it
-            # X[icount, ifreq,  0] = Zapp[ifreq,0] * 1.E-06
-            # X[icount, ifreq,  1] = Zapp[ifreq,1] * 1.E-06
-            # X[icount, ifreq,  2] = Zapp[ifreq,2] * 1.E-06
-            # X[icount, ifreq,  3] = Zapp[ifreq,3] * 1.E-06
-            # X[icount, ifreq,  4] = Zapp_err[ifreq,0] * 1.E-07
-            # X[icount, ifreq,  5] = Zapp_err[ifreq,1] * 1.E-07
-            # X[icount, ifreq,  6] = Zapp_err[ifreq,2] * 1.E-07
-            # X[icount, ifreq,  7] = Zapp_err[ifreq,3] * 1.E-07
-            # X[icount, ifreq,  8] = Zphs[ifreq,0] / 180.0
-            # X[icount, ifreq,  9] = Zphs[ifreq,1] / 180.0
-            # X[icount, ifreq, 10] = Zphs[ifreq,2] / 180.0
-            # X[icount, ifreq, 11] = Zphs[ifreq,3] / 180.0
-            # X[icount, ifreq, 12] = Zphs_err[ifreq,0] / 180.0
-            # X[icount, ifreq, 13] = Zphs_err[ifreq,1] / 180.0
-            # X[icount, ifreq, 14] = Zphs_err[ifreq,2] / 180.0
-            # X[icount, ifreq, 15] = Zphs_err[ifreq,3] / 180.0
-
             X[icount, ifreq,  0] = (np.log10( Zapp[ifreq,1] )+4)*0.01
             X[icount, ifreq,  1] = (np.log10( Zapp[ifreq,2] )+4)*0.01
             # X[icount, ifreq,  2] = (np.log10( Zapp_err[ifreq,1] )+4)*0.01
@@ -150,35 +137,6 @@ def getXYdataset(X,y,nfreq,fdir,lists,freq_interp):
                 X[icount, ifreq, 13] = np.abs((Zphs[ifreq-1,2]-Zphs[ifreq,2]) / 540.0 )
                 X[icount, ifreq, 14] = np.abs((Zphs_err[ifreq-1,1]-Zphs_err[ifreq,1]) / 540.0 )
                 X[icount, ifreq, 15] = np.abs((Zphs_err[ifreq-1,2]-Zphs_err[ifreq,2]) / 540.0 )
-
-
-            # X[icount, ifreq,  0] = Zapp[ifreq,1] * 1.E-06
-            # X[icount, ifreq,  1] = Zapp[ifreq,2] * 1.E-06
-            # X[icount, ifreq,  2] = Zapp_err[ifreq,1] * 1.E-07
-            # X[icount, ifreq,  3] = Zapp_err[ifreq,2] * 1.E-07
-            # X[icount, ifreq,  4] = Zphs[ifreq,1] / 180.0
-            # X[icount, ifreq,  5] = Zphs[ifreq,2] / 180.0
-            # X[icount, ifreq,  6] = Zphs_err[ifreq,1] / 180.0
-            # X[icount, ifreq,  7] = Zphs_err[ifreq,2] / 180.0
-            # if ifreq < nfreq-1:
-            #     X[icount, ifreq,  8] = np.abs((Zapp[ifreq,1] - Zapp[ifreq+1,1]) * 1.E-06 )
-            #     X[icount, ifreq,  9] = np.abs((Zapp[ifreq,2] - Zapp[ifreq+1,2]) * 1.E-06 )
-            #     X[icount, ifreq, 10] = np.abs((Zapp_err[ifreq,1]-Zapp_err[ifreq+1,1]) * 1.E-07 )
-            #     X[icount, ifreq, 11] = np.abs((Zapp_err[ifreq,2]-Zapp_err[ifreq+1,2]) * 1.E-07 )
-            #     X[icount, ifreq, 12] = np.abs((Zphs[ifreq,1]-Zphs[ifreq+1,1]) / 180.0 )
-            #     X[icount, ifreq, 13] = np.abs((Zphs[ifreq,2]-Zphs[ifreq+1,2]) / 180.0 )
-            #     X[icount, ifreq, 14] = np.abs((Zphs_err[ifreq,1]-Zphs_err[ifreq+1,1]) / 180.0 )
-            #     X[icount, ifreq, 15] = np.abs((Zphs_err[ifreq,2]-Zphs_err[ifreq+1,2]) / 180.0 )
-            #
-            # else:
-            #     X[icount, ifreq,  8] = np.abs( (Zapp[ifreq-1,1] - Zapp[ifreq,1]) * 1.E-06 )
-            #     X[icount, ifreq,  9] = np.abs((Zapp[ifreq-1,2] - Zapp[ifreq,2]) * 1.E-06 )
-            #     X[icount, ifreq, 10] = np.abs((Zapp_err[ifreq-1,1]-Zapp_err[ifreq,1]) * 1.E-07 )
-            #     X[icount, ifreq, 11] = np.abs((Zapp_err[ifreq-1,2]-Zapp_err[ifreq,2]) * 1.E-07 )
-            #     X[icount, ifreq, 12] = np.abs((Zphs[ifreq-1,1]-Zphs[ifreq,1]) / 180.0 )
-            #     X[icount, ifreq, 13] = np.abs((Zphs[ifreq-1,2]-Zphs[ifreq,2]) / 180.0 )
-            #     X[icount, ifreq, 14] = np.abs((Zphs_err[ifreq-1,1]-Zphs_err[ifreq,1]) / 180.0 )
-            #     X[icount, ifreq, 15] = np.abs((Zphs_err[ifreq-1,2]-Zphs_err[ifreq,2]) / 180.0 )
 
             # print( 'Zapp   [%12.5e %12.5e %12.5e %12.5e] '%(X[icount, ifreq, 0],X[icount, ifreq, 1],X[icount, ifreq, 2],X[icount, ifreq, 3]) )
             # print( 'Zphs   [%12.5e %12.5e %12.5e %12.5e] '%(X[icount, ifreq, 8],X[icount, ifreq, 9],X[icount, ifreq, 10],X[icount, ifreq, 11]) )
@@ -251,60 +209,6 @@ def getX_unrated(X,nfreq,fdir,lists,freq_interp):
         for ifreq in range(nfreq):
             # if Z[ifreq,0].real > 1.E+06:
             #     print( MTdirname, 'over 1.E+07')
-
-            # X[icount, ifreq,  0] = Zapp[ifreq,0] * 1.E-06
-            # X[icount, ifreq,  1] = Zapp[ifreq,1] * 1.E-06
-            # X[icount, ifreq,  2] = Zapp[ifreq,2] * 1.E-06
-            # X[icount, ifreq,  3] = Zapp[ifreq,3] * 1.E-06
-            # X[icount, ifreq,  4] = Zapp_err[ifreq,0]* 1.E-07
-            # X[icount, ifreq,  5] = Zapp_err[ifreq,1]* 1.E-07
-            # X[icount, ifreq,  6] = Zapp_err[ifreq,2]* 1.E-07
-            # X[icount, ifreq,  7] = Zapp_err[ifreq,3]* 1.E-07
-            # X[icount, ifreq,  8] = Zphs[ifreq,0] / 180.0
-            # X[icount, ifreq,  9] = Zphs[ifreq,1] / 180.0
-            # X[icount, ifreq, 10] = Zphs[ifreq,2] / 180.0
-            # X[icount, ifreq, 11] = Zphs[ifreq,3] / 180.0
-            # X[icount, ifreq, 12] = Zphs_err[ifreq,0] / 180.0
-            # X[icount, ifreq, 13] = Zphs_err[ifreq,1] / 180.0
-            # X[icount, ifreq, 14] = Zphs_err[ifreq,2] / 180.0
-            # X[icount, ifreq, 15] = Zphs_err[ifreq,3] / 180.0
-
-            # X[icount, ifreq,  0] = Zapp[ifreq,1] * 1.E-06
-            # X[icount, ifreq,  1] = Zapp[ifreq,2] * 1.E-06
-            # X[icount, ifreq,  2] = Zapp_err[ifreq,1]* 1.E-07
-            # X[icount, ifreq,  3] = Zapp_err[ifreq,2]* 1.E-07
-            # X[icount, ifreq,  4] = Zphs[ifreq,1] / 180.0
-            # X[icount, ifreq,  5] = Zphs[ifreq,2] / 180.0
-            # X[icount, ifreq,  6] = Zphs_err[ifreq,1] / 180.0
-            # X[icount, ifreq,  7] = Zphs_err[ifreq,2] / 180.0
-
-            # X[icount, ifreq,  0] = Zapp[ifreq,1] * 1.E-06
-            # X[icount, ifreq,  1] = Zapp[ifreq,2] * 1.E-06
-            # X[icount, ifreq,  2] = Zapp_err[ifreq,1] * 1.E-07
-            # X[icount, ifreq,  3] = Zapp_err[ifreq,2] * 1.E-07
-            # X[icount, ifreq,  4] = Zphs[ifreq,1] / 180.0
-            # X[icount, ifreq,  5] = Zphs[ifreq,2] / 180.0
-            # X[icount, ifreq,  6] = Zphs_err[ifreq,1] / 180.0
-            # X[icount, ifreq,  7] = Zphs_err[ifreq,2] / 180.0
-            # if ifreq < nfreq-1:
-            #     X[icount, ifreq,  8] = np.abs((Zapp[ifreq,1] - Zapp[ifreq+1,1]) * 1.E-06 )
-            #     X[icount, ifreq,  9] = np.abs((Zapp[ifreq,2] - Zapp[ifreq+1,2]) * 1.E-06 )
-            #     X[icount, ifreq, 10] = np.abs((Zapp_err[ifreq,1]-Zapp_err[ifreq+1,1]) * 1.E-07 )
-            #     X[icount, ifreq, 11] = np.abs((Zapp_err[ifreq,2]-Zapp_err[ifreq+1,2]) * 1.E-07 )
-            #     X[icount, ifreq, 12] = np.abs((Zphs[ifreq,1]-Zphs[ifreq+1,1]) / 180.0 )
-            #     X[icount, ifreq, 13] = np.abs((Zphs[ifreq,2]-Zphs[ifreq+1,2]) / 180.0 )
-            #     X[icount, ifreq, 14] = np.abs((Zphs_err[ifreq,1]-Zphs_err[ifreq+1,1]) / 180.0 )
-            #     X[icount, ifreq, 15] = np.abs((Zphs_err[ifreq,2]-Zphs_err[ifreq+1,2]) / 180.0 )
-            #
-            # else:
-            #     X[icount, ifreq,  8] = np.abs( (Zapp[ifreq-1,1] - Zapp[ifreq,1]) * 1.E-06 )
-            #     X[icount, ifreq,  9] = np.abs((Zapp[ifreq-1,2] - Zapp[ifreq,2]) * 1.E-06 )
-            #     X[icount, ifreq, 10] = np.abs((Zapp_err[ifreq-1,1]-Zapp_err[ifreq,1]) * 1.E-07 )
-            #     X[icount, ifreq, 11] = np.abs((Zapp_err[ifreq-1,2]-Zapp_err[ifreq,2]) * 1.E-07 )
-            #     X[icount, ifreq, 12] = np.abs((Zphs[ifreq-1,1]-Zphs[ifreq,1]) / 180.0 )
-            #     X[icount, ifreq, 13] = np.abs((Zphs[ifreq-1,2]-Zphs[ifreq,2]) / 180.0 )
-            #     X[icount, ifreq, 14] = np.abs((Zphs_err[ifreq-1,1]-Zphs_err[ifreq,1]) / 180.0 )
-            #     X[icount, ifreq, 15] = np.abs((Zphs_err[ifreq-1,2]-Zphs_err[ifreq,2]) / 180.0 )
 
             X[icount, ifreq,  0] = (np.log10( Zapp[ifreq,1] )+4)*0.01
             X[icount, ifreq,  1] = (np.log10( Zapp[ifreq,2] )+4)*0.01

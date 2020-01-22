@@ -14,4 +14,4 @@ if missing_dependencies:
 del hard_dependencies, dependency, missing_dependencies
 
 from . import utils
-# from . import vis
+from . import vis
