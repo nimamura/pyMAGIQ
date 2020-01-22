@@ -264,7 +264,7 @@ def getX_unrated(X,nfreq,fdir,lists,freq_interp):
     return X,unrated_list,xml_dict
 
 #************************************************************************/
-def checklists(XMLlist=None,EDIlist=None,ZRRlist=None):
+def checklists(XMLlist=None,EDIlist=None,Zlist=None):
     # confirm number of xml is one
     # if XMLlist exists
     if XMLlist:
@@ -278,10 +278,10 @@ def checklists(XMLlist=None,EDIlist=None,ZRRlist=None):
             print( 'number of edifile is not one' )
             sys.exit()
 
-    # if ZRRlist exists
-    if ZRRlist:
-        if len(ZRRlist) is not 1:
-            print( 'number of zrrfile is not one' )
+    # if Zlist exists
+    if Zlist:
+        if len(Zlist) is not 1:
+            print( 'number of z-file is not one' )
             sys.exit()
 
 #************************************************************************/
