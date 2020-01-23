@@ -34,7 +34,7 @@ unrated
 ```
 
 ## Run code
-1. Please run pre-process by using notebooks/preprocess.ipynb. Once pre-process has done, you will get npy-files in preprocessed directory.
+1. Please run pre-process by using notebooks/preprocess.ipynb. Once pre-process has done, you will get csv files in preprocessed directory.
 ```
 jupyter notebook preprocess.ipynb
 ```
