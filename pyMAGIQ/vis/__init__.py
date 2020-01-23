@@ -1,2 +1,2 @@
-from . import plotUSmap
-from . import plotZ
+from . import plotmap
+from . import plotz
