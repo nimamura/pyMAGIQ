@@ -32,6 +32,24 @@ preprocessed
 train
 unrated
 ```
+Hierarchy of this directory is like the following.
+```
+pyMAGIQ
+└── survey
+    ├── outputs
+    ├── preprocessed
+    ├── train
+    │   ├── MT_TF_USArray.ALW48.2015
+    │   │   ├── ALW48bc_V47coh.png
+    │   │   │── ALW48bc_V47coh.zrr
+    │   │   │── USArray.ALW48.2015.edi
+    │   │   │── USArray.ALW48.2015.xml
+    │   ├── ...
+    ├── unrated
+    │   ├── MT_TF_CAFE-MT.CAF02.2010
+    │   │   ├── CAF002.png
+    │   │   │── ...
+```
 
 ## Run code
 1. Please run pre-process by using notebooks/preprocess.ipynb. Once pre-process has done, you will get csv files in preprocessed directory.
